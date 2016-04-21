@@ -1,0 +1,47 @@
+.w{
+    width: 1200px;
+    margin: 0 auto;
+}
+.floor{
+
+    background-color: #666666;
+    margin: 20px 0;
+    color: #fff;
+    font-size: 30px;
+    text-align: center;
+    position: relative;
+}
+.elevator{
+    width: 30px;
+    overflow: hidden;
+    position: fixed;
+    display: none;
+    text-align: center;
+}
+.elevator li{
+    cursor: pointer;
+    height: 26px;
+    line-height: 26px;
+    border-bottom: 1px solid #333;
+}
+.elevator li.hover{
+    background-color: #f00;
+    color: #fff;
+}
+
+.product{
+
+}
+
+.product li{
+    width: 130px;
+    height: 130px;
+    margin: 10px;
+    float: left;
+}
+
+.tpl1{
+ background-color: red;
+
+
+}
