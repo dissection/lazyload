@@ -40,9 +40,7 @@
             "fn" == _op.type && (dom = _op.source);
         }
         var main= function(){
-
             var $lay = "img" == _op.type ?  $("img[" + _op.source + "][" + _op.source + "!=done]", _this.el) :"fn" == _op.type ? $(dom, _this.el) :"js" == _op.type &&　_this.el;
-
             _size=$lay.size();
 
             var _scrollTop = $(document).scrollTop();
