@@ -207,11 +207,11 @@
         })
 
 
-        $("mod-floor").lazyload({
+        $("#con").lazyload({
             type:"fn",
-            source:$("#con"),
             onchange:function(d){
                 $.get(d.attr("data-lazy-path"),function(da){
+                    //一般来说 不需要 再次 懒加载 因为触发 这里已经 表示 ，盒子块 进入屏幕
                     d.append($(da)[0])
                             .lazyload({
                         blankImgUrl:"../../images/share/loading.gif"

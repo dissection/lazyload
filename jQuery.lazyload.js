@@ -25,7 +25,7 @@
 
         _this.el = $(element);
         var _op=_this.options=  $.extend({}, Lazyload.DEFAULTS, options || {});
-        var dom="IMG";
+        var dom="div";
         if ("img" == _op.type) {
             //并且 给 this.el 元素 添加 install 元素 表示 模块安装了 懒加载
             "img" == _op.type && ("data-lazy-path" == _op.source && (_op.source = "data-lazy-img"),
@@ -36,22 +36,18 @@
                     !_size){
                 return !1
             }
-        } else{
-            "fn" == _op.type && (dom = _op.source);
         }
+
         var main= function(){
-            var $lay = "img" == _op.type ?  $("img[" + _op.source + "][" + _op.source + "!=done]", _this.el) :"fn" == _op.type ? $(dom, _this.el) :"js" == _op.type &&　_this.el;
-            _size=$lay.size();
+            var $lay = "img" == _op.type ?  $("img[" + _op.source + "][" + _op.source + "!=done]", _this.el) :_this.el ;
+            _size  = $lay.length;
 
             var _scrollTop = $(document).scrollTop();
             var _scrollTopWin = _scrollTop+$(window).height()+_op.space;
             $.each($lay, function () {
                 var $this = $(this);
-
-                var _source = null;
-                if (("js" == _op.type || "img" == _op.type) && (_source = $this.attr(_op.source)/*,console.log(_op.type+ " |"+_source)*/),
-                    _source || "fn" == _op.type || "img" == _op.type){
-                    var _getTop = _this.getTop($this);
+                var _source = _op.source;
+                    var _getTop =  $this.offset().top;
 
                     /*
                      * 当元素 offsetTop 大于 0 [ _getTop > 0 ]
@@ -63,16 +59,16 @@
                     //console.log(_scrollTopWin +" | "+_getTop);
 
                     if(_getTop > 0 && _size > 0 && _getTop > _scrollTop - $this.outerHeight() && _scrollTopWin > _getTop){
-                        var _SourcePath;
-                        "img" == _op.type ? (_SourcePath = $this.attr(_op.source),"done" != _SourcePath ? (_this.loadImg($this, _SourcePath, _op),
-                            _size -= 1) : "done" == _SourcePath && (_size -= 1)) : "js" == _op.type ?  _this.loadJs($this,_source, function() {
+                        var _path = $this.attr(_op.source);
+                        "img" == _op.type ? ("done" != _path ? (_this.loadImg($this, _path, _op),
+                            _size -= 1) : "done" == _path && (_size -= 1)) : "js" == _op.type ?  _this.loadJs($this,_path, function() {
                             _size -= 1
                         }) : "fn" == _op.type && _this.loadFn($this, _op, function() {
                             _size -= 1
                         })
                     }
 
-                }
+
             });
             //当 img的 个数已经不存在的时候 ,表示这一次 函数域 内的 懒加载 结束
             _size || ("img" == _op.type && _sourceInstall && _this.el.removeAttr(_sourceInstall),
@@ -90,7 +86,7 @@
 
 
         "img"==_op.type && "1" != _this.el.attr(_sourceInstall) && (_this.el.attr(_sourceInstall, 1)),
-        "fn" == _op.type && _op.source.attr("data-lazyload-fn", "0"),
+        "fn" == _op.type && _this.el.attr("data-lazyload-fn", "0"),
         "js" == _op.type && _this.el.attr("data-lazyload-js", "0"),
             $(window).bind("scroll", _lazyload),
             $(window).bind("resize", _lazyload);
@@ -98,17 +94,16 @@
 
 
     };
-
+    Lazyload.VERSION = '1.0.0';
     Lazyload.DEFAULTS={
         type: "img",
         source: "data-lazy-path",
-        init: "data-lazy-init", //模块化 参数 名
         delay: 100,   //
         space: 100,   //容错空间
         onchange: null ,
-        placeholderClass: "loading-style",
+        //placeholderClass: "loading-style",
         errorClass: "err-poster",
-        blankImgUrl:"../../images/share/bank.gif"
+        blankImgUrl:null
     };
 
     //loadImg
@@ -126,11 +121,11 @@
             $that.attr(_op.source, "done"),
         _SourcePath || $that.attr("src") || $that.attr("src", _op.blankImgUrl),
         _SourcePath && ($that[0].onerror = function() {
-                $that.attr("src", _op.blankImgUrl).removeClass(_op.placeholderClass).addClass(_op.errorClass)
-            },
-                $that[0].onload = function() {
+                $that.attr("src", _op.blankImgUrl).addClass(_op.errorClass)
+            }
+                /*,$that[0].onload = function() {
                     $that.removeClass(_op.placeholderClass)
-                }
+                }*/
         ),
         $.isFunction(_op.onchange) && _op.onchange.call(this)
     };
@@ -145,7 +140,7 @@
     Lazyload.prototype.loadFn= function ($that, _op, _fn) {
         "0" == $that.attr("data-lazyload-fn") && ($that.attr("data-lazyload-fn", "done"),
             _fn(),
-        _op.onchange && _op.onchange($that))
+        $.isFunction(_op.onchange) && _op.onchange.call(this,$that))
     };
 
 
@@ -158,7 +153,6 @@
      * */
     Lazyload.prototype.loadJs= function ($that,_url, d) {
         var _this=this,_op=_this.options;
-        //console.log(_url)
         if(_url){
             $.ajax({
                 url: _url,
@@ -167,32 +161,14 @@
                 success:function(){
                     "0" == $that.attr("data-lazyload-js") && $that.attr("data-lazyload-js", "done"),
 
-                    $.isFunction(_op.onchange) && _op.onchange.call()
+                    $.isFunction(_op.onchange) && _op.onchange.call(_this , $that)
                 }
             }),d()
         }else{
-            $.error("ajax 路径不存在")
+            $.error("\u0061\u006a\u0061\u0078\u0020\u8def\u5f84\u4e0d\u5b58\u5728")
 
         }
 
-
-    };
-
-
-    //Utils
-    Lazyload.prototype.getTop=function(a) {
-        /* var b = a.offsetTop;
-         if (null  != a.parentNode) {
-         var c = a.offsetParent;
-         console.log( a.parentNode)
-         console.log(c)
-
-         for (; null  != c; )
-         b += c.offsetTop,
-         c = c.offsetParent
-         }
-         return b*/
-        return a.offset().top
     };
 
     // LOADIMG PLUGIN DEFINITION
